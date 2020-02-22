@@ -1,9 +1,11 @@
 // transpile:mocha
 
-import { pkgRoot } from '../lib/utils';
+import { pkgRoot, configureBinaryLog } from '../lib/utils';
 import { fs } from 'appium-support';
 import chai from 'chai';
 import path from 'path';
+import { Doctor } from '../lib/doctor';
+
 
 chai.should();
 
@@ -19,6 +21,16 @@ describe('utils', function () {
       'wow.txt'))).should.be.ok;
     (await fs.exists(path.resolve(pkgRoot, 'test', 'fixtures',
       'notwow.txt'))).should.not.be.ok;
+  });
+
+  function logHandler (level, prefix, msg) {
+    `${level} ${prefix} ${msg}`.should.include('AppiumDoctor');
+  }
+
+  it('Should handle logs through logHandler callback', function () {
+    configureBinaryLog({ logHandler });
+    let doctor = new Doctor();
+    doctor.run();
   });
 
 });
